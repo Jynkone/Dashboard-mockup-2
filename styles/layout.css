@@ -1,0 +1,220 @@
+/* Layout styles for dashboard grid structure */
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: 60px 1fr 120px 100px;
+    grid-template-areas: 
+        "header header"
+        "content content"
+        "timeline timeline"
+        "carousel carousel";
+    height: 100vh;
+    width: 100vw;
+    padding: 10px;
+    gap: 10px;
+}
+
+.header {
+    grid-area: header;
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.content-container {
+    grid-area: content;
+    display: flex;
+    gap: 10px;
+}
+
+.map-container {
+    flex: 1;
+    background-color: white;
+    border-radius: 5px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.timeline {
+    grid-area: timeline;
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.event-carousel {
+    grid-area: carousel;
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Header elements */
+.header h1 {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    padding: 0 10px;
+    flex: 1;
+    max-width: 400px;
+    margin: 0 20px;
+}
+
+.search-container input {
+    background: none;
+    border: none;
+    color: white;
+    padding: 8px;
+    width: 100%;
+    outline: none;
+}
+
+.search-container input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-container button {
+    background: none;
+    border: none;
+    color: white;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Dropdown menus in header */
+.filter-dropdown, .drone-dropdown {
+    position: relative;
+}
+
+.filter-button, .drone-button {
+    background-color: #34495e;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+
+.filter-content, .drone-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    border-radius: 3px;
+    padding: 10px;
+    z-index: 50;
+    right: 0;
+    min-width: 180px;
+}
+
+.filter-dropdown:hover .filter-content,
+.drone-dropdown:hover .drone-content {
+    display: block;
+}
+
+.filter-content label, .drone-content label {
+    display: block;
+    padding: 5px 0;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.toggle-button, .action-button {
+    background-color: #34495e;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.toggle-button.active {
+    background-color: #e74c3c;
+}
+
+.action-button {
+    background-color: #3498db;
+}
+
+.toggle-button:hover, .action-button:hover {
+    filter: brightness(1.1);
+}
+
+/* Responsive layout */
+@media (max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px 1fr 250px 120px 100px;
+        grid-template-areas: 
+            "header"
+            "content"
+            "sidebar"
+            "timeline"
+            "carousel";
+    }
+    
+    .content-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+    }
+    
+    .alerts-panel, .drone-details {
+        flex: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .search-container {
+        max-width: 100%;
+        margin: 0;
+    }
+    
+    .sidebar {
+        flex-direction: column;
+    }
+    
+    .dashboard {
+        grid-template-rows: auto 1fr auto auto auto;
+        padding: 5px;
+        gap: 5px;
+    }
+}

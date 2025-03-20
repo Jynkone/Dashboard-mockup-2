@@ -1,0 +1,319 @@
+/* Timeline styles */
+
+.timeline {
+    position: relative;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.timeline-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.timeline-controls button {
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f0f2f5;
+}
+
+.timeline-controls button:hover {
+    background-color: #e0e2e5;
+}
+
+.timeline-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#currentTime {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+#timeRange {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 3px;
+    font-size: 0.9rem;
+}
+
+/* Blender-style timeline tracks */
+.timeline-tracks {
+    display: flex;
+    height: 70px;
+    margin-bottom: 5px;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+}
+
+.track-labels {
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #eee;
+}
+
+.track-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    border-bottom: 1px solid #eee;
+    background-color: #f0f2f5;
+}
+
+.track-label:hover {
+    background-color: #e0e2e5;
+}
+
+.tracks-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline-track {
+    flex: 1;
+    position: relative;
+    border-bottom: 1px solid #eee;
+}
+
+/* Main timeline slider */
+.timeline-slider {
+    height: 30px;
+    position: relative;
+}
+
+.timeline-track-main {
+    height: 4px;
+    background-color: #ddd;
+    border-radius: 2px;
+    position: relative;
+    margin: 8px 0;
+}
+
+.timeline-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30%;
+    background-color: #3498db;
+    border-radius: 2px;
+}
+
+.timeline-handle {
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    width: 16px;
+    height: 16px;
+    background-color: #3498db;
+    border: 3px solid white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 5;
+}
+
+.time-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #7f8c8d;
+}
+
+/* Event markers on timeline */
+.event-marker {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.event-marker.selected {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
+    z-index: 4;
+}
+
+.event-marker.person {
+    background-color: #9b59b6;
+}
+
+.event-marker.vehicle {
+    background-color: #f1c40f;
+}
+
+.event-marker.thermal {
+    background-color: #e74c3c;
+}
+
+.event-marker.checkpoint {
+    background-color: #27ae60;
+}
+
+.event-marker:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+.event-tooltip {
+    position: absolute;
+    visibility: hidden;
+    width: 150px;
+    background-color: rgba(52, 73, 94, 0.9);
+    color: white;
+    text-align: left;
+    border-radius: 3px;
+    padding: 5px;
+    font-size: 0.75rem;
+    top: -30px;
+    left: -75px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.event-marker:hover .event-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Event carousel */
+.event-carousel {
+    position: relative;
+}
+
+.carousel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    margin-bottom: 10px;
+}
+
+.carousel-header h3 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.carousel-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.carousel-controls button {
+    background: none;
+    border: none;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f0f2f5;
+}
+
+.carousel-container {
+    display: flex;
+    overflow-x: auto;
+    padding: 5px;
+    gap: 10px;
+}
+
+.event-card {
+    min-width: 200px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    border-top: 3px solid;
+    transition: transform 0.2s;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+}
+
+.event-card.person {
+    border-top-color: #9b59b6;
+}
+
+.event-card.vehicle {
+    border-top-color: #f1c40f;
+}
+
+.event-card.thermal {
+    border-top-color: #e74c3c;
+}
+
+.event-card.checkpoint {
+    border-top-color: #27ae60;
+}
+
+.event-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.event-type {
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.event-time {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+}
+
+.event-thumbnail {
+    width: 100%;
+    height: 80px;
+    background-color: #eee;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.event-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-description {
+    font-size: 0.8rem;
+    color: #4d4d4d;
+    margin-bottom: 5px;
+    max-height: 3.6em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.event-location {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+}

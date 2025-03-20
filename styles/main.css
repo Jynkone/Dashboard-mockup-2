@@ -1,0 +1,108 @@
+/* Main CSS file that imports all component styles */
+
+/* Import component styles */
+@import url('layout.css');
+@import url('map.css');
+@import url('sidebar.css');
+@import url('timeline.css');
+@import url('alerts.css');
+@import url('modals.css');
+@import url('reports.css');
+
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    color: #333;
+    overflow: hidden;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Status colors */
+.status-normal {
+    color: #2ecc71;
+}
+
+.status-caution {
+    color: #f1c40f;
+}
+
+.status-critical {
+    color: #e74c3c;
+}
+
+/* Severity levels */
+.severity-high {
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.severity-medium {
+    color: #f1c40f;
+    border-color: #f1c40f;
+}
+
+.severity-low {
+    color: #3498db;
+    border-color: #3498db;
+}
+
+/* Animation for pulse (used for critical alerts) */
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.5; }
+}
+
+/* Tooltip styles (used throughout the dashboard) */
+.tooltip {
+    position: absolute;
+    visibility: hidden;
+    background-color: rgba(52, 73, 94, 0.9);
+    color: white;
+    text-align: left;
+    border-radius: 3px;
+    padding: 8px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 100;
+    max-width: 250px;
+}
+
+.tooltip-trigger:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Icon styles */
+.icon-button {
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.icon-button:hover {
+    color: #2c3e50;
+}
+
+.icon-button.active {
+    color: #3498db;
+}
