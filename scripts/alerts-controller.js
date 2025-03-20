@@ -197,33 +197,53 @@ const AlertsController = (function() {
     }
     
     // Show alert on map
-    function showAlertOnMap(alertId) {
-        const alerts = DashboardState.getAlerts();
-        const alert = alerts.find(a => a.id === alertId);
+// In alerts-controller.js - Update the showAlertOnMap function
+function showAlertOnMap(alertId) {
+    const alerts = DashboardState.getAlerts();
+    const alert = alerts.find(a => a.id === alertId);
+    
+    if (!alert) return;
+    
+    // If the alert is associated with a checkpoint, select it
+    if (alert.checkpointId) {
+        DashboardState.setSelectedCheckpoint(alert.checkpointId);
         
-        if (!alert) return;
-        
-        // If the alert is associated with a checkpoint, select it
-        if (alert.checkpointId) {
-            DashboardState.setSelectedCheckpoint(alert.checkpointId);
-        }
-        
-        // If the alert is associated with a drone, select it
-        if (alert.droneId) {
-            DashboardState.setActiveDrone(alert.droneId);
-        }
-        
-        // If the alert is associated with an object, select it
-        if (alert.objectId) {
-            DashboardState.setSelectedObject(alert.objectId);
-        }
-        
-        // If the alert has an event id, select it
-        if (alert.eventId) {
-            DashboardState.setSelectedEvent(alert.eventId);
+        // Add a visual flash to the checkpoint on the map
+        const checkpointElement = document.querySelector(`.checkpoint[data-id="${alert.checkpointId}"]`);
+        if (checkpointElement) {
+            checkpointElement.classList.add('flash');
+            setTimeout(() => {
+                checkpointElement.classList.remove('flash');
+            }, 1000);
         }
     }
     
+    // If the alert is associated with a drone, select it
+    if (alert.droneId) {
+        DashboardState.setActiveDrone(alert.droneId);
+        
+        // Add a visual flash to the drone on the map
+        const droneElement = document.querySelector(`.drone-marker[data-id="${alert.droneId}"]`);
+        if (droneElement) {
+            droneElement.classList.add('flash');
+            setTimeout(() => {
+                droneElement.classList.remove('flash');
+            }, 1000);
+        }
+    }
+    
+    // If the alert has an event id, select it
+    if (alert.eventId) {
+        DashboardState.setSelectedEvent(alert.eventId);
+        
+        // Set timeline position to this event time
+        const event = DashboardState.getEvents().find(e => e.id === alert.eventId);
+        if (event) {
+            const position = TimelineController.calculatePositionForTime(event.timestamp);
+            DashboardState.setTimelinePosition(position);
+        }
+    }
+}    
     // Show alert details
     function showAlertDetails(alertId) {
         const alerts = DashboardState.getAlerts();

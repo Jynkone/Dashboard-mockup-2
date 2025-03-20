@@ -241,43 +241,43 @@ const TimelineController = (function() {
     }
     
     // Add event marker to track
-    function addEventMarker(event, trackElement) {
-        // Calculate position based on time
-        const position = calculatePositionForTime(event.timestamp);
-        
-        // Skip if position is outside timeline range
-        if (position < 0 || position > 100) return;
-        
-        // Create marker element
-        const marker = document.createElement('div');
-        marker.className = `event-marker ${event.type.toLowerCase()}`;
-        marker.setAttribute('data-id', event.id);
-        marker.setAttribute('data-time', event.timestamp.toISOString());
-        marker.style.left = `${position}%`;
-        marker.title = `${event.type} - ${Utils.formatTime(event.timestamp)}`;
-        
-        // Add click handler
-        marker.addEventListener('click', function() {
-            DashboardState.setSelectedEvent(event.id);
-        });
-        
-        // Create tooltip
-        const tooltip = document.createElement('div');
-        tooltip.className = 'event-tooltip';
-        tooltip.textContent = `${event.description} (${Utils.formatTime(event.timestamp)})`;
-        marker.appendChild(tooltip);
-        
-        // Add to track
-        trackElement.appendChild(marker);
-        
-        // Store reference
-        eventMarkers.push({
-            id: event.id,
-            element: marker,
-            position: position
-        });
-    }
+// In timeline-controller.js - Update the addEventMarker function
+function addEventMarker(event, trackElement) {
+    // Calculate position based on time
+    const position = calculatePositionForTime(event.timestamp);
     
+    // Skip if position is outside timeline range
+    if (position < 0 || position > 100) return;
+    
+    // Create marker element
+    const marker = document.createElement('div');
+    marker.className = `event-marker ${event.type.toLowerCase()} tooltip-trigger`;
+    marker.setAttribute('data-id', event.id);
+    marker.setAttribute('data-time', event.timestamp.toISOString());
+    marker.style.left = `${position}%`;
+    marker.title = `${event.type} - ${Utils.formatTime(event.timestamp)}`;
+    
+    // Add click handler
+    marker.addEventListener('click', function() {
+        DashboardState.setSelectedEvent(event.id);
+    });
+    
+    // Create tooltip
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = `${event.description} (${Utils.formatTime(event.timestamp)})`;
+    marker.appendChild(tooltip);
+    
+    // Add to track
+    trackElement.appendChild(marker);
+    
+    // Store reference
+    eventMarkers.push({
+        id: event.id,
+        element: marker,
+        position: position
+    });
+}    
     // Calculate position on timeline for a timestamp
     function calculatePositionForTime(timestamp) {
         const now = new Date();
@@ -308,9 +308,36 @@ const TimelineController = (function() {
             if (Math.abs(position - currentPosition) > 10) {
                 DashboardState.setTimelinePosition(position);
             }
+            
+            // Show event details in carousel
+            const event = DashboardState.getSelectedEvent();
+            if (event) {
+                // Create a card for this event
+                const eventCards = [event].map(createEventCard);
+                
+                // Update the carousel container
+                const container = document.getElementById('eventCarouselContainer');
+                container.innerHTML = '';
+                eventCards.forEach(card => container.appendChild(card));
+                
+                // Show the carousel with an appropriate title
+                SearchController.showEventCarousel('Event Details');
+            }
         }
     }
     
+    // Helper function to create event cards
+    function createEventCard(event) {
+        const card = document.createElement('div');
+        card.className = `event-card ${event.type.toLowerCase()} ${event.id === DashboardState.getSelectedEvent()?.id ? 'selected' : ''}`;
+        card.setAttribute('data-id', event.id);
+        
+        // Create card content (header, thumbnail, description, etc.)
+        // This can be shared with the code in renderEventCarousel
+        
+        return card;
+    }
+        
     // Public API
     return {
         init,

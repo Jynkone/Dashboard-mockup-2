@@ -30,6 +30,14 @@ const SearchController = (function() {
                 performSearch(this.value);
             }
         });
+        
+        // Close carousel button (if it exists)
+        const closeCarouselBtn = document.getElementById('closeCarousel');
+        if (closeCarouselBtn) {
+            closeCarouselBtn.addEventListener('click', function() {
+                hideEventCarousel();
+            });
+        }
     }
     
     // Perform search
@@ -197,192 +205,185 @@ const SearchController = (function() {
             return;
         }
         
-        // For this implementation, we'll show results in the event carousel
-        // In a real implementation, this would be a more sophisticated search results view
-        
         // Create synthetic events from all result types
         const searchEvents = [];
         
-// Convert alerts to event format
-results.alerts.forEach(alert => {
-    searchEvents.push({
-        id: `search-alert-${alert.id}`,
-        type: 'Alert',
-        severity: alert.severity,
-        description: alert.message,
-        location: alert.location,
-        timestamp: alert.timestamp,
-        imageUrl: alert.imageUrl,
-        originalId: alert.id,
-        resultType: 'alert'
-    });
-});
-
-// Convert objects to event format
-results.objects.forEach(object => {
-    searchEvents.push({
-        id: `search-object-${object.id}`,
-        type: object.type,
-        severity: object.authorized ? 'Low' : 'High',
-        description: `${object.authorized ? 'Authorized' : 'Unauthorized'} ${object.type} detected`,
-        location: object.location,
-        timestamp: object.timestamp,
-        originalId: object.id,
-        resultType: 'object'
-    });
-});
-
-// Convert checkpoints to event format
-results.checkpoints.forEach(checkpoint => {
-    searchEvents.push({
-        id: `search-checkpoint-${checkpoint.id}`,
-        type: 'Checkpoint',
-        severity: checkpoint.status === 'normal' ? 'Low' : 
-                 checkpoint.status === 'caution' ? 'Medium' : 'High',
-        description: `${checkpoint.name} - ${checkpoint.status.charAt(0).toUpperCase() + checkpoint.status.slice(1)} status`,
-        location: checkpoint.location,
-        timestamp: checkpoint.lastChecked,
-        originalId: checkpoint.id,
-        resultType: 'checkpoint'
-    });
-});
-
-// Add actual events
-results.events.forEach(event => {
-    searchEvents.push({
-        ...event,
-        resultType: 'event'
-    });
-});
-
-// Sort by timestamp (newest first)
-searchEvents.sort((a, b) => b.timestamp - a.timestamp);
-
-// Display results in carousel
-displaySearchResultsInCarousel(searchEvents);
-}
-
-// Display search results in the event carousel
-function displaySearchResultsInCarousel(searchEvents) {
-const carousel = document.getElementById('eventCarousel');
-carousel.innerHTML = '';
-
-// Add search result header
-const header = document.createElement('div');
-header.className = 'search-results-header';
-header.textContent = `Found ${searchEvents.length} results`;
-carousel.appendChild(header);
-
-// Add event cards
-searchEvents.forEach(event => {
-    const card = document.createElement('div');
-    card.className = `event-card ${event.type.toLowerCase()}`;
-    card.setAttribute('data-id', event.id);
-    card.setAttribute('data-result-type', event.resultType);
-    card.setAttribute('data-original-id', event.originalId || event.id);
-    
-    card.addEventListener('click', () => {
-        handleSearchResultClick(event);
-    });
-    
-    // Card header
-    const cardHeader = document.createElement('div');
-    cardHeader.className = 'event-card-header';
-    
-    const eventType = document.createElement('div');
-    eventType.className = 'event-type';
-    eventType.textContent = event.type;
-    
-    const eventTime = document.createElement('div');
-    eventTime.className = 'event-time';
-    eventTime.textContent = Utils.formatRelativeTime(event.timestamp);
-    
-    cardHeader.appendChild(eventType);
-    cardHeader.appendChild(eventTime);
-    
-    // Thumbnail
-    const thumbnail = document.createElement('div');
-    thumbnail.className = 'event-thumbnail';
-    
-    if (event.imageUrl) {
-        const img = document.createElement('img');
-        img.src = event.imageUrl;
-        img.alt = event.type;
-        thumbnail.appendChild(img);
+        // Convert alerts to event format
+        results.alerts.forEach(alert => {
+            searchEvents.push({
+                id: `search-alert-${alert.id}`,
+                type: 'Alert',
+                severity: alert.severity,
+                description: alert.message,
+                location: alert.location,
+                timestamp: alert.timestamp,
+                imageUrl: alert.imageUrl,
+                originalId: alert.id,
+                resultType: 'alert'
+            });
+        });
+        
+        // Convert objects to event format
+        results.objects.forEach(object => {
+            searchEvents.push({
+                id: `search-object-${object.id}`,
+                type: object.type,
+                severity: object.authorized ? 'Low' : 'High',
+                description: `${object.authorized ? 'Authorized' : 'Unauthorized'} ${object.type} detected`,
+                location: object.location,
+                timestamp: object.timestamp,
+                originalId: object.id,
+                resultType: 'object'
+            });
+        });
+        
+        // Convert checkpoints to event format
+        results.checkpoints.forEach(checkpoint => {
+            searchEvents.push({
+                id: `search-checkpoint-${checkpoint.id}`,
+                type: 'Checkpoint',
+                severity: checkpoint.status === 'normal' ? 'Low' : 
+                         checkpoint.status === 'caution' ? 'Medium' : 'High',
+                description: `${checkpoint.name} - ${checkpoint.status.charAt(0).toUpperCase() + checkpoint.status.slice(1)} status`,
+                location: checkpoint.location,
+                timestamp: checkpoint.lastChecked,
+                originalId: checkpoint.id,
+                resultType: 'checkpoint'
+            });
+        });
+        
+        // Add actual events
+        results.events.forEach(event => {
+            searchEvents.push({
+                ...event,
+                resultType: 'event'
+            });
+        });
+        
+        // Sort by timestamp (newest first)
+        searchEvents.sort((a, b) => b.timestamp - a.timestamp);
+        
+        // Display results in carousel
+        displaySearchResultsInCarousel(searchEvents);
+        
+        // Show the carousel with results count as title
+        showEventCarousel(`Found ${searchEvents.length} results`);
     }
     
-    // Description
-    const description = document.createElement('div');
-    description.className = 'event-description';
-    description.textContent = event.description;
-    
-    // Location
-    const location = document.createElement('div');
-    location.className = 'event-location';
-    location.textContent = event.location;
-    
-    // Result type
-    const resultType = document.createElement('div');
-    resultType.className = 'event-result-type';
-    resultType.textContent = `Result Type: ${event.resultType.charAt(0).toUpperCase() + event.resultType.slice(1)}`;
-    
-    // Assemble card
-    card.appendChild(cardHeader);
-    card.appendChild(thumbnail);
-    card.appendChild(description);
-    card.appendChild(location);
-    card.appendChild(resultType);
-    
-    carousel.appendChild(card);
-});
-}
-
-// Handle search result click
-function handleSearchResultClick(event) {
-switch (event.resultType) {
-    case 'alert':
-        const alert = DashboardState.getAlerts().find(a => a.id === event.originalId);
-        if (alert) {
-            // Show the alert on the map and in the alerts panel
-            if (alert.checkpointId) {
-                DashboardState.setSelectedCheckpoint(alert.checkpointId);
-            }
-            
-            if (alert.droneId) {
-                DashboardState.setActiveDrone(alert.droneId);
-            }
-            
-            // Highlight in alerts list
-            const alertItem = document.querySelector(`.alert-item[data-id="${alert.id}"]`);
-            if (alertItem) {
-                alertItem.scrollIntoView({ behavior: 'smooth' });
-                alertItem.classList.add('highlighted');
-                
-                // Remove highlight after a delay
-                setTimeout(() => {
-                    alertItem.classList.remove('highlighted');
-                }, 2000);
-            }
+    // Show the event carousel
+    function showEventCarousel(title) {
+        const carousel = document.getElementById('eventCarousel');
+        const carouselTitle = document.getElementById('carouselTitle');
+        
+        // Set the title
+        if (title && carouselTitle) {
+            carouselTitle.textContent = title;
         }
-        break;
         
-    case 'object':
-        DashboardState.setSelectedObject(event.originalId);
-        break;
+        // Show the carousel
+        if (carousel) {
+            carousel.style.display = 'block';
+            
+            // Adjust the map container size to make room
+            adjustMapSize();
+        }
+    }
+    
+    // Hide the carousel
+    function hideEventCarousel() {
+        const carousel = document.getElementById('eventCarousel');
+        if (carousel) {
+            carousel.style.display = 'none';
+            
+            // Readjust the map container size
+            adjustMapSize();
+        }
+    }
+    
+    // Adjust map size based on carousel visibility
+    function adjustMapSize() {
+        const mapContainer = document.querySelector('.map-container');
+        const carousel = document.getElementById('eventCarousel');
         
-    case 'checkpoint':
-        DashboardState.setSelectedCheckpoint(event.originalId);
-        break;
+        if (!mapContainer || !carousel) return;
         
-    case 'event':
-        DashboardState.setSelectedEvent(event.originalId || event.id);
-        break;
-}
-}
-
-// Public API
-return {
-init,
-performSearch
-};
+        if (carousel.style.display === 'none') {
+            // Carousel is hidden, give more space to map
+            mapContainer.style.height = 'calc(100% - 120px)'; // Just account for timeline
+        } else {
+            // Carousel is visible, reduce map size
+            mapContainer.style.height = 'calc(100% - 220px)'; // Account for timeline and carousel
+        }
+        
+        // Update map dimensions in the controller
+        if (MapController && MapController.updateMapDimensions) {
+            MapController.updateMapDimensions();
+        }
+    }
+    
+    // Display search results in the event carousel
+    function displaySearchResultsInCarousel(searchEvents) {
+        const carousel = document.getElementById('eventCarouselContainer');
+        if (!carousel) return;
+        
+        carousel.innerHTML = '';
+        
+        // Add event cards using the utility function
+        searchEvents.forEach(event => {
+            const card = Utils.createEventCard(event);
+            carousel.appendChild(card);
+        });
+    }
+    
+    // Handle search result click
+    function handleSearchResultClick(event) {
+        switch (event.resultType) {
+            case 'alert':
+                const alert = DashboardState.getAlerts().find(a => a.id === event.originalId);
+                if (alert) {
+                    // Show the alert on the map and in the alerts panel
+                    if (alert.checkpointId) {
+                        DashboardState.setSelectedCheckpoint(alert.checkpointId);
+                    }
+                    
+                    if (alert.droneId) {
+                        DashboardState.setActiveDrone(alert.droneId);
+                    }
+                    
+                    // Highlight in alerts list
+                    const alertItem = document.querySelector(`.alert-item[data-id="${alert.id}"]`);
+                    if (alertItem) {
+                        alertItem.scrollIntoView({ behavior: 'smooth' });
+                        alertItem.classList.add('highlighted');
+                        
+                        // Remove highlight after a delay
+                        setTimeout(() => {
+                            alertItem.classList.remove('highlighted');
+                        }, 2000);
+                    }
+                }
+                break;
+                
+            case 'object':
+                DashboardState.setSelectedObject(event.originalId);
+                break;
+                
+            case 'checkpoint':
+                DashboardState.setSelectedCheckpoint(event.originalId);
+                break;
+                
+            case 'event':
+                DashboardState.setSelectedEvent(event.originalId || event.id);
+                break;
+        }
+    }
+    
+    // Public API
+    return {
+        init,
+        performSearch,
+        showEventCarousel,
+        hideEventCarousel,
+        handleSearchResultClick
+    };
 })();

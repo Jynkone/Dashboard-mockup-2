@@ -260,38 +260,43 @@ const DroneController = (function() {
     }
     
     // Update AI detection overlays
-    function updateDetections(detections) {
-        // Remove existing detection boxes
-        document.querySelectorAll('.detection-box').forEach(box => {
-            box.remove();
-        });
-        
-        // Add new detection boxes
-        detections.forEach(detection => {
-            // Create detection box
-            const detectionBox = document.createElement('div');
-            detectionBox.className = `detection-box ${detection.type.toLowerCase()}`;
-            detectionBox.style.top = `${detection.position.y}%`;
-            detectionBox.style.left = `${detection.position.x}%`;
-            detectionBox.style.width = `${detection.size.width}px`;
-            detectionBox.style.height = `${detection.size.height}px`;
-            
-            // Create detection label
-            const detectionLabel = document.createElement('div');
-            detectionLabel.className = `detection-label ${detection.type.toLowerCase()}`;
-            detectionLabel.textContent = detection.type;
-            
-            // Create confidence score
-            const confidenceScore = document.createElement('div');
-            confidenceScore.className = 'confidence-score';
-            confidenceScore.textContent = `${detection.confidence}%`;
-            
-            detectionBox.appendChild(detectionLabel);
-            detectionBox.appendChild(confidenceScore);
-            feedOverlay.appendChild(detectionBox);
-        });
-    }
+    // In drone-controller.js - Enhance the updateDetections function
+function updateDetections(detections) {
+    // Remove existing detection boxes
+    document.querySelectorAll('.detection-box').forEach(box => {
+        box.remove();
+    });
     
+    // Add new detection boxes
+    detections.forEach(detection => {
+        // Create detection box
+        const detectionBox = document.createElement('div');
+        detectionBox.className = `detection-box ${detection.type.toLowerCase()}`;
+        detectionBox.style.top = `${detection.position.y}%`;
+        detectionBox.style.left = `${detection.position.x}%`;
+        detectionBox.style.width = `${detection.size.width}px`;
+        detectionBox.style.height = `${detection.size.height}px`;
+        
+        // Create detection label
+        const detectionLabel = document.createElement('div');
+        detectionLabel.className = `detection-label ${detection.type.toLowerCase()}`;
+        detectionLabel.textContent = detection.type;
+        
+        // Create confidence score
+        const confidenceScore = document.createElement('div');
+        confidenceScore.className = 'confidence-score';
+        confidenceScore.textContent = `${detection.confidence}%`;
+        
+        detectionBox.appendChild(detectionLabel);
+        detectionBox.appendChild(confidenceScore);
+        feedOverlay.appendChild(detectionBox);
+        
+        // Add pulse effect for unauthorized entities
+        if (detection.type.toLowerCase().includes('unauthorized')) {
+            detectionBox.classList.add('pulse');
+        }
+    });
+}
     // Set active camera view (optical, thermal, zoom)
     function setActiveCameraView(view) {
         // Hide all feeds

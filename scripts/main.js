@@ -20,6 +20,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize any remaining components
     initializeModals();
     initializeEventCarousel();
+
+        // Make sure carousel is hidden initially
+        document.getElementById('eventCarousel').style.display = 'none';
+    
+        // Adjust map size
+        adjustMapSize();
+    
 });
 
 // Set up global event handlers
@@ -76,6 +83,27 @@ function setupGlobalEventHandlers() {
     document.getElementById('nextEvent').addEventListener('click', function() {
         navigateCarousel(1);
     });
+
+        // Close carousel button
+        document.getElementById('closeCarousel').addEventListener('click', function() {
+            SearchController.hideEventCarousel();
+        });
+        
+        // Make search button show carousel with results
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const searchInput = document.getElementById('globalSearch');
+            if (searchInput.value.trim()) {
+                SearchController.performSearch(searchInput.value);
+            }
+        });
+        
+        // Also trigger search on Enter key
+        document.getElementById('globalSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                SearchController.performSearch(this.value);
+            }
+        });
+    
 }
 
 // Initialize modal components
@@ -102,6 +130,35 @@ function initializeModals() {
             this.classList.add('active');
         });
     });
+
+    document.querySelectorAll('.layer-menu input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const layer = this.getAttribute('data-layer');
+            const visible = this.checked;
+            
+            DashboardState.setLayerVisibility(layer, visible);
+            
+            // Provide immediate visual feedback
+            switch (layer) {
+                case 'drones':
+                    document.querySelector('.drone-layer').style.display = visible ? 'block' : 'none';
+                    break;
+                case 'checkpoints':
+                    document.querySelector('.checkpoint-layer').style.display = visible ? 'block' : 'none';
+                    break;
+                case 'thermal-history':
+                    document.querySelector('.thermal-history').style.display = visible ? 'block' : 'none';
+                    break;
+                case 'objects':
+                    document.querySelector('.objects-layer').style.display = visible ? 'block' : 'none';
+                    break;
+                case 'paths':
+                    document.querySelector('.drone-path').style.display = visible ? 'block' : 'none';
+                    break;
+            }
+        });
+    });
+
     
     // Add export handlers
     document.getElementById('exportPDF').addEventListener('click', function() {
@@ -124,6 +181,26 @@ function initializeEventCarousel() {
         highlightCarouselCard(eventId);
     });
 }
+
+function adjustMapSize() {
+    const mapContainer = document.querySelector('.map-container');
+    const carousel = document.getElementById('eventCarousel');
+    
+    if (carousel.style.display === 'none') {
+        // Carousel is hidden, give more space to map
+        mapContainer.style.height = 'calc(100% - 120px)'; // Just account for timeline
+    } else {
+        // Carousel is visible, reduce map size
+        mapContainer.style.height = 'calc(100% - 220px)'; // Account for timeline and carousel
+    }
+    
+    // Update map dimensions in the controller
+    if (MapController && MapController.updateMapDimensions) {
+        MapController.updateMapDimensions();
+    }
+}
+
+
 
 // Navigate carousel
 function navigateCarousel(direction) {
@@ -202,6 +279,7 @@ function renderEventCarousel(events) {
 }
 
 // Highlight carousel card
+// In main.js - Update the highlightCarouselCard function
 function highlightCarouselCard(eventId) {
     // Remove highlight from all cards
     document.querySelectorAll('.event-card').forEach(card => {
@@ -213,11 +291,16 @@ function highlightCarouselCard(eventId) {
     if (card) {
         card.classList.add('selected');
         
-        // Scroll card into view
+        // Scroll card into view with smooth behavior
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        
+        // Add temporary flash effect
+        card.classList.add('flash');
+        setTimeout(() => {
+            card.classList.remove('flash');
+        }, 500);
     }
 }
-
 // Load mock data for demonstration
 function loadMockData() {
     // Load mock drones
@@ -461,4 +544,23 @@ function loadMockData() {
     // Set default selections
     DashboardState.setActiveDrone('drone1');
     DashboardState.setTimelinePosition(30);
+
+    MapController.renderMap();
+    AlertsController.renderAlerts();
+    TimelineController.renderEvents(DashboardState.getEvents());
+    
+    // Set default selections
+    DashboardState.setActiveDrone('drone1');
+    DashboardState.setTimelinePosition(30);
+    
+    // Make sure UI controls reflect state
+    document.querySelectorAll('.toggle-button').forEach(button => {
+        const id = button.id;
+        if (id === 'thermalViewToggle') {
+            button.classList.toggle('active', DashboardState.isThermalViewActive());
+        } else if (id === 'patrolViewToggle') {
+            button.classList.toggle('active', DashboardState.isPatrolViewActive());
+        }
+    });
+
 }

@@ -163,19 +163,20 @@
         </div>
         
         <!-- Event Carousel -->
-        <div class="event-carousel">
-            <div class="carousel-header">
-                <h3>Event Details</h3>
-                <div class="carousel-controls">
-                    <button id="prevEvent"><i class="fas fa-chevron-left"></i></button>
-                    <button id="nextEvent"><i class="fas fa-chevron-right"></i></button>
-                </div>
-            </div>
-            <div class="carousel-container" id="eventCarousel">
-                <!-- Event cards will be populated dynamically -->
-            </div>
+<!-- In index.html - Modify the event-carousel section -->
+<div class="event-carousel" id="eventCarousel" style="display: none;">
+    <div class="carousel-header">
+        <h3 id="carouselTitle">Event Details</h3>
+        <div class="carousel-controls">
+            <button id="prevEvent"><i class="fas fa-chevron-left"></i></button>
+            <button id="nextEvent"><i class="fas fa-chevron-right"></i></button>
+            <button id="closeCarousel" class="close-btn"><i class="fas fa-times"></i></button>
         </div>
     </div>
+    <div class="carousel-container" id="eventCarouselContainer">
+        <!-- Event cards will be populated dynamically -->
+    </div>
+</div>
 
     <!-- Modal templates -->
     <!-- Detailed Event Modal -->

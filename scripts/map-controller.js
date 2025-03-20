@@ -51,48 +51,49 @@ const MapController = (function() {
     }
     
     // Initialize map layers
-    function initializeMapLayers() {
-        // Create drone layer
-        const droneLayer = document.createElement('div');
-        droneLayer.className = 'drone-layer';
-        mapOverlay.appendChild(droneLayer);
-        
-        // Create checkpoint layer
-        const checkpointLayer = document.createElement('div');
-        checkpointLayer.className = 'checkpoint-layer';
-        mapOverlay.appendChild(checkpointLayer);
-        
-        // Create objects layer
-        const objectsLayer = document.createElement('div');
-        objectsLayer.className = 'objects-layer';
-        mapOverlay.appendChild(objectsLayer);
-        
-        // Create paths layer
-        const pathsLayer = document.createElement('div');
-        pathsLayer.className = 'drone-path';
-        pathsLayer.style.display = 'none';
-        mapOverlay.appendChild(pathsLayer);
-        
-        // Create thermal overlay
-        const thermalOverlay = document.createElement('div');
-        thermalOverlay.className = 'thermal-overlay';
-        mapOverlay.appendChild(thermalOverlay);
-        
-        // Create thermal history overlay
-        const thermalHistoryOverlay = document.createElement('div');
-        thermalHistoryOverlay.className = 'thermal-overlay thermal-history';
-        thermalHistoryOverlay.style.opacity = '0.3';
-        thermalHistoryOverlay.style.display = 'none';
-        mapOverlay.appendChild(thermalHistoryOverlay);
-        
-        // Load background map image
-        const mapImage = document.createElement('img');
-        mapImage.src = 'images/facility-map.png'; // Placeholder
-        mapImage.className = 'map-image';
-        mapImage.alt = 'Facility Map';
-        mapContainer.appendChild(mapImage);
-    }
+// Update the initializeMapLayers function in map-controller.js
+
+function initializeMapLayers() {
+    // Load background map image first
+    const mapImage = document.createElement('img');
+    mapImage.src = 'images/facility-map.png'; // Ensure this path points to your satellite image
+    mapImage.className = 'map-image';
+    mapImage.alt = 'Facility Map';
+    mapContainer.appendChild(mapImage);
     
+    // Create drone layer
+    const droneLayer = document.createElement('div');
+    droneLayer.className = 'drone-layer';
+    mapOverlay.appendChild(droneLayer);
+    
+    // Create checkpoint layer
+    const checkpointLayer = document.createElement('div');
+    checkpointLayer.className = 'checkpoint-layer';
+    mapOverlay.appendChild(checkpointLayer);
+    
+    // Create objects layer
+    const objectsLayer = document.createElement('div');
+    objectsLayer.className = 'objects-layer';
+    mapOverlay.appendChild(objectsLayer);
+    
+    // Create paths layer
+    const pathsLayer = document.createElement('div');
+    pathsLayer.className = 'drone-path';
+    pathsLayer.style.display = 'none';
+    mapOverlay.appendChild(pathsLayer);
+    
+    // Create thermal overlay
+    const thermalOverlay = document.createElement('div');
+    thermalOverlay.className = 'thermal-overlay';
+    mapOverlay.appendChild(thermalOverlay);
+    
+    // Create thermal history overlay
+    const thermalHistoryOverlay = document.createElement('div');
+    thermalHistoryOverlay.className = 'thermal-overlay thermal-history';
+    thermalHistoryOverlay.style.opacity = '0.3';
+    thermalHistoryOverlay.style.display = 'none';
+    mapOverlay.appendChild(thermalHistoryOverlay);
+}    
     // Set up event listeners
     function setupEventListeners() {
         // Map zoom controls
@@ -190,55 +191,52 @@ const MapController = (function() {
     }
     
     // Render drones on the map
-    function renderDrones(drones) {
-        const droneLayer = mapOverlay.querySelector('.drone-layer');
-        droneLayer.innerHTML = '';
-        
-        drones.forEach(drone => {
-            // Skip drones filtered out based on current filters
-            if (
-                (!DashboardState.isDroneFilterActive('thermal') && drone.features.includes('thermal')) ||
-                (!DashboardState.isDroneFilterActive('optical') && drone.features.includes('optical')) ||
-                (DashboardState.isDroneFilterActive('active') && drone.status !== 'active')
-            ) {
-                return;
-            }
-            
-            // Create drone marker
-            const droneMarker = Utils.createElement('div', {
-                className: `drone-marker ${drone.status}`,
-                'data-id': drone.id,
-                style: {
-                    top: `${drone.position.y}%`,
-                    left: `${drone.position.x}%`
-                },
-                title: drone.name,
-                onclick: () => DashboardState.setActiveDrone(drone.id)
-            }, []);
-            
-            // Create tooltip
-            const tooltip = Utils.createElement('div', {
-                className: 'tooltip'
-            }, [
-                Utils.createElement('strong', {}, [drone.name]),
-                Utils.createElement('div', {}, [`Battery: ${drone.battery}%`]),
-                Utils.createElement('div', {}, [`Altitude: ${drone.altitude}m`]),
-                Utils.createElement('div', {}, [`Features: ${drone.features.join(', ')}`]),
-                ...(drone.status === 'low-battery' ? [
-                    Utils.createElement('div', {
-                        className: 'warning'
-                    }, ['Low Battery Warning'])
-                ] : [])
-            ]);
-            
-            droneMarker.appendChild(tooltip);
-            droneLayer.appendChild(droneMarker);
-            
-            // Store reference
-            mapElements.drones[drone.id] = droneMarker;
-        });
-    }
+    // In map-controller.js - Update the renderDrones function
+function renderDrones(drones) {
+    const droneLayer = mapOverlay.querySelector('.drone-layer');
+    droneLayer.innerHTML = '';
     
+    drones.forEach(drone => {
+        // Skip drones filtered out based on current filters
+        if (
+            (!DashboardState.isDroneFilterActive('thermal') && drone.features.includes('thermal')) ||
+            (!DashboardState.isDroneFilterActive('optical') && drone.features.includes('optical')) ||
+            (DashboardState.isDroneFilterActive('active') && drone.status !== 'active')
+        ) {
+            return;
+        }
+        
+        // Create drone marker
+        const droneMarker = document.createElement('div');
+        droneMarker.className = `drone-marker ${drone.status} tooltip-trigger`;
+        droneMarker.setAttribute('data-id', drone.id);
+        droneMarker.style.top = `${drone.position.y}%`;
+        droneMarker.style.left = `${drone.position.x}%`;
+        droneMarker.title = drone.name;
+        droneMarker.addEventListener('click', () => {
+            DashboardState.setActiveDrone(drone.id);
+        });
+        
+        // Create tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        
+        // Add tooltip content
+        tooltip.innerHTML = `
+            <strong>${drone.name}</strong>
+            <div>Battery: ${drone.battery}%</div>
+            <div>Altitude: ${drone.altitude}m</div>
+            <div>Features: ${drone.features.join(', ')}</div>
+            ${drone.status === 'low-battery' ? '<div class="warning">Low Battery Warning</div>' : ''}
+        `;
+        
+        droneMarker.appendChild(tooltip);
+        droneLayer.appendChild(droneMarker);
+        
+        // Store reference
+        mapElements.drones[drone.id] = droneMarker;
+    });
+}
     // Highlight active drone
     function highlightDrone(droneId) {
         // Remove highlight from all drones
@@ -249,114 +247,117 @@ const MapController = (function() {
         // Add highlight to active drone
         if (droneId && mapElements.drones[droneId]) {
             mapElements.drones[droneId].classList.add('selected');
+            
+            // Optionally scroll the drone into view if using a scrollable map
+            // mapElements.drones[droneId].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
-    
-    // Render checkpoints on the map
-    function renderCheckpoints(checkpoints) {
-        const checkpointLayer = mapOverlay.querySelector('.checkpoint-layer');
-        checkpointLayer.innerHTML = '';
         
-        checkpoints.forEach(checkpoint => {
-            // Create checkpoint element
-            const checkpointElement = Utils.createElement('div', {
-                className: `checkpoint ${checkpoint.status}`,
-                'data-id': checkpoint.id,
-                style: {
-                    top: `${checkpoint.position.y}%`,
-                    left: `${checkpoint.position.x}%`,
-                },
-                title: checkpoint.name,
-                onclick: () => DashboardState.setSelectedCheckpoint(checkpoint.id)
-            }, []);
-            
-            // Create tooltip
-            const tooltip = Utils.createElement('div', {
-                className: 'tooltip'
-            }, [
-                Utils.createElement('strong', {}, [`${checkpoint.name} - ${checkpoint.location}`]),
-                Utils.createElement('div', {}, [`Status: ${checkpoint.status.charAt(0).toUpperCase() + checkpoint.status.slice(1)}`]),
-                Utils.createElement('div', {}, [`Last checked: ${Utils.formatRelativeTime(checkpoint.lastChecked)}`])
-            ]);
-            
-            checkpointElement.appendChild(tooltip);
-            checkpointLayer.appendChild(checkpointElement);
-            
-            // Store reference
-            mapElements.checkpoints[checkpoint.id] = checkpointElement;
-        });
-    }
+    // Render checkpoints on the map
+    // In map-controller.js - Update the renderCheckpoints function
+function renderCheckpoints(checkpoints) {
+    const checkpointLayer = mapOverlay.querySelector('.checkpoint-layer');
+    checkpointLayer.innerHTML = '';
     
+    checkpoints.forEach(checkpoint => {
+        // Create checkpoint element
+        const checkpointElement = document.createElement('div');
+        checkpointElement.className = `checkpoint ${checkpoint.status} tooltip-trigger`;
+        checkpointElement.setAttribute('data-id', checkpoint.id);
+        checkpointElement.style.top = `${checkpoint.position.y}%`;
+        checkpointElement.style.left = `${checkpoint.position.x}%`;
+        checkpointElement.title = checkpoint.name;
+        checkpointElement.addEventListener('click', () => {
+            DashboardState.setSelectedCheckpoint(checkpoint.id);
+        });
+        
+        // Create tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        
+        // Add tooltip content
+        tooltip.innerHTML = `
+            <strong>${checkpoint.name} - ${checkpoint.location}</strong>
+            <div>Status: ${checkpoint.status.charAt(0).toUpperCase() + checkpoint.status.slice(1)}</div>
+            <div>Last checked: ${Utils.formatRelativeTime(checkpoint.lastChecked)}</div>
+        `;
+        
+        checkpointElement.appendChild(tooltip);
+        checkpointLayer.appendChild(checkpointElement);
+        
+        // Store reference
+        mapElements.checkpoints[checkpoint.id] = checkpointElement;
+    });
+}
     // Highlight selected checkpoint
     function highlightCheckpoint(checkpointId) {
         // Remove highlight from all checkpoints
         Object.values(mapElements.checkpoints).forEach(marker => {
+            marker.classList.remove('selected');
             marker.style.boxShadow = 'none';
         });
         
         // Add highlight to selected checkpoint
         if (checkpointId && mapElements.checkpoints[checkpointId]) {
-            mapElements.checkpoints[checkpointId].style.boxShadow = `0 0 15px ${Utils.getStatusColor(
-                DashboardState.getSelectedCheckpoint().status
-            )}`;
+            const checkpoint = DashboardState.getSelectedCheckpoint();
+            if (checkpoint) {
+                const color = Utils.getStatusColor(checkpoint.status);
+                mapElements.checkpoints[checkpointId].classList.add('selected');
+                mapElements.checkpoints[checkpointId].style.boxShadow = `0 0 15px ${color}`;
+            }
         }
     }
-    
-    // Render detected objects on the map
-    function renderDetectedObjects(objects) {
-        const objectsLayer = mapOverlay.querySelector('.objects-layer');
-        objectsLayer.innerHTML = '';
         
-        objects.forEach(object => {
-            // Skip objects filtered out based on current filters
-            if (!DashboardState.isFilterActive(object.type.toLowerCase())) {
-                return;
-            }
-            
-            // Create object marker
-            const objectMarker = Utils.createElement('div', {
-                className: `object-marker ${object.type.toLowerCase()} ${object.authorized ? '' : 'unauthorized'}`,
-                'data-id': object.id,
-                style: {
-                    top: `${object.position.y}%`,
-                    left: `${object.position.x}%`
-                },
-                title: `${object.type} ${object.authorized ? '' : '(Unauthorized)'}`,
-                onclick: () => DashboardState.setSelectedObject(object.id)
-            }, []);
-            
-            // Add direction indicator if moving
-            if (object.direction !== undefined) {
-                const indicator = Utils.createElement('div', {
-                    className: 'direction-indicator',
-                    style: {
-                        transform: `translateY(-100%) rotate(${object.direction}deg)`
-                    }
-                }, []);
-                
-                objectMarker.appendChild(indicator);
-            }
-            
-            // Create tooltip
-            const tooltip = Utils.createElement('div', {
-                className: 'tooltip'
-            }, [
-                Utils.createElement('strong', {}, [
-                    `${object.type} ${object.authorized ? '' : '(Unauthorized)'}`
-                ]),
-                Utils.createElement('div', {}, [`Detected: ${Utils.formatRelativeTime(object.timestamp)}`]),
-                Utils.createElement('div', {}, [`Location: ${object.location}`]),
-                Utils.createElement('div', {}, [`Confidence: ${object.confidence}%`])
-            ]);
-            
-            objectMarker.appendChild(tooltip);
-            objectsLayer.appendChild(objectMarker);
-            
-            // Store reference
-            mapElements.objects[object.id] = objectMarker;
-        });
-    }
+    // Render detected objects on the map
+// In map-controller.js - Update the renderDetectedObjects function
+function renderDetectedObjects(objects) {
+    const objectsLayer = mapOverlay.querySelector('.objects-layer');
+    objectsLayer.innerHTML = '';
     
+    objects.forEach(object => {
+        // Skip objects filtered out based on current filters
+        if (!DashboardState.isFilterActive(object.type.toLowerCase())) {
+            return;
+        }
+        
+        // Create object marker
+        const objectMarker = document.createElement('div');
+        objectMarker.className = `object-marker ${object.type.toLowerCase()} ${object.authorized ? '' : 'unauthorized'} tooltip-trigger`;
+        objectMarker.setAttribute('data-id', object.id);
+        objectMarker.style.top = `${object.position.y}%`;
+        objectMarker.style.left = `${object.position.x}%`;
+        objectMarker.title = `${object.type} ${object.authorized ? '' : '(Unauthorized)'}`;
+        objectMarker.addEventListener('click', () => {
+            DashboardState.setSelectedObject(object.id);
+        });
+        
+        // Add direction indicator if moving
+        if (object.direction !== undefined) {
+            const indicator = document.createElement('div');
+            indicator.className = 'direction-indicator';
+            indicator.style.transform = `translateY(-100%) rotate(${object.direction}deg)`;
+            objectMarker.appendChild(indicator);
+        }
+        
+        // Create tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        
+        // Add tooltip content
+        tooltip.innerHTML = `
+            <strong>${object.type} ${object.authorized ? '' : '(Unauthorized)'}</strong>
+            <div>Detected: ${Utils.formatRelativeTime(object.timestamp)}</div>
+            <div>Location: ${object.location}</div>
+            <div>Confidence: ${object.confidence}%</div>
+        `;
+        
+        objectMarker.appendChild(tooltip);
+        objectsLayer.appendChild(objectMarker);
+        
+        // Store reference
+        mapElements.objects[object.id] = objectMarker;
+    });
+}    
     // Highlight selected object
     function highlightObject(objectId) {
         // Remove highlight from all objects

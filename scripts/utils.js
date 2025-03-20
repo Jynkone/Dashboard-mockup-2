@@ -167,6 +167,75 @@ const Utils = (function() {
         },
         
         /**
+         * Create an event card element
+         * @param {Object} event - Event data object
+         * @param {boolean} isSelected - Whether this card should be highlighted as selected
+         * @returns {HTMLElement} The created event card element
+         */
+        createEventCard: function(event, isSelected = false) {
+            const card = document.createElement('div');
+            card.className = `event-card ${event.type.toLowerCase()} ${isSelected ? 'selected' : ''}`;
+            card.setAttribute('data-id', event.id);
+            card.setAttribute('data-result-type', event.resultType || 'event');
+            card.setAttribute('data-original-id', event.originalId || event.id);
+            
+            // Card header
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'event-card-header';
+            
+            const eventType = document.createElement('div');
+            eventType.className = 'event-type';
+            eventType.textContent = event.type;
+            
+            const eventTime = document.createElement('div');
+            eventTime.className = 'event-time';
+            eventTime.textContent = this.formatRelativeTime(event.timestamp);
+            
+            cardHeader.appendChild(eventType);
+            cardHeader.appendChild(eventTime);
+            
+            // Thumbnail
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'event-thumbnail';
+            
+            if (event.imageUrl) {
+                const img = document.createElement('img');
+                img.src = event.imageUrl;
+                img.alt = event.type;
+                thumbnail.appendChild(img);
+            }
+            
+            // Description
+            const description = document.createElement('div');
+            description.className = 'event-description';
+            description.textContent = event.description;
+            
+            // Location
+            const location = document.createElement('div');
+            location.className = 'event-location';
+            location.textContent = event.location;
+            
+            // Assemble card
+            card.appendChild(cardHeader);
+            card.appendChild(thumbnail);
+            card.appendChild(description);
+            card.appendChild(location);
+            
+            // Add click event handler
+            card.addEventListener('click', () => {
+                if (event.resultType === 'event' || !event.resultType) {
+                    DashboardState.setSelectedEvent(event.id);
+                } else if (typeof SearchController !== 'undefined' && 
+                          typeof SearchController.handleSearchResultClick === 'function') {
+                    // Handle other result types (alert, checkpoint, object)
+                    SearchController.handleSearchResultClick(event);
+                }
+            });
+            
+            return card;
+        },
+        
+        /**
          * Calculate distance between two coordinates
          * @param {object} coord1 - First coordinate {x, y}
          * @param {object} coord2 - Second coordinate {x, y}
