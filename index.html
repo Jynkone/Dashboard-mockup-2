@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Security Operations Dashboard</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <h1>Operations Dashboard - Drone Security Monitoring</h1>
+            <div class="search-container">
+                <input type="text" id="globalSearch" placeholder="Search by object, time, or location...">
+                <button id="searchButton"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-controls">
+                <div class="filter-dropdown">
+                    <button class="filter-button">Filter Objects</button>
+                    <div class="filter-content">
+                        <label><input type="checkbox" checked data-filter="person">Person</label>
+                        <label><input type="checkbox" checked data-filter="vehicle">Vehicle</label>
+                        <label><input type="checkbox" checked data-filter="thermal">Thermal Events</label>
+                        <label><input type="checkbox" checked data-filter="high">High Severity</label>
+                        <label><input type="checkbox" checked data-filter="medium">Medium Severity</label>
+                        <label><input type="checkbox" checked data-filter="low">Low Severity</label>
+                    </div>
+                </div>
+                <div class="drone-dropdown">
+                    <button class="drone-button">Drone Controls</button>
+                    <div class="drone-content">
+                        <label><input type="checkbox" checked data-drone="thermal">Thermal Camera</label>
+                        <label><input type="checkbox" checked data-drone="optical">Optical Camera</label>
+                        <label><input type="checkbox" checked data-drone="active">Active Only</label>
+                    </div>
+                </div>
+                <button id="thermalViewToggle" class="toggle-button">Thermal View</button>
+                <button id="patrolViewToggle" class="toggle-button">Patrol Routes</button>
+                <button id="reportsButton" class="action-button">Reports & Analysis</button>
+            </div>
+        </header>
+        
+        <!-- Main content area with map and sidebar -->
+        <div class="content-container">
+            <!-- Map Container -->
+            <div class="map-container">
+                <div id="facilityMap" class="map-view">
+                    <!-- Map will be initialized here by JavaScript -->
+                </div>
+                
+                <div class="map-overlay">
+                    <!-- Drone markers, checkpoints, and other overlays will be added dynamically -->
+                </div>
+                
+                <div class="map-controls">
+                    <button title="Zoom In" id="zoomIn"><i class="fas fa-plus"></i></button>
+                    <button title="Zoom Out" id="zoomOut"><i class="fas fa-minus"></i></button>
+                    <div class="layer-control">
+                        <button title="Toggle Layers"><i class="fas fa-layers"></i></button>
+                        <div class="layer-menu">
+                            <label><input type="checkbox" checked data-layer="drones"> Drones</label>
+                            <label><input type="checkbox" checked data-layer="checkpoints"> Checkpoints</label>
+                            <label><input type="checkbox" data-layer="thermal-history"> Thermal History</label>
+                            <label><input type="checkbox" checked data-layer="objects"> Detected Objects</label>
+                            <label><input type="checkbox" data-layer="paths"> Drone Paths</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <aside class="sidebar">
+                <!-- Alerts Panel -->
+                <div class="alerts-panel">
+                    <div class="panel-header">
+                        <h2>ALERTS</h2>
+                        <div class="alert-controls">
+                            <span id="activeAlertCount">3 active</span>
+                            <button id="acknowledgeAll" title="Acknowledge All"><i class="fas fa-check-double"></i></button>
+                        </div>
+                    </div>
+                    <div class="alerts-list" id="alertsList">
+                        <!-- Alerts will be populated dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Drone Details Panel -->
+                <div class="drone-details">
+                    <div class="panel-header">
+                        <h2 id="activeDroneTitle">DRONE FEED</h2>
+                        <div class="feed-controls">
+                            <span class="feed-status">Live</span>
+                            <button class="view-toggle" data-view="optical">Optical</button>
+                            <button class="view-toggle" data-view="thermal">Thermal</button>
+                            <button class="view-toggle" data-view="zoom">Zoom</button>
+                        </div>
+                    </div>
+                    <div class="drone-feed" id="droneFeed">
+                        <!-- Feed will be initialized by JavaScript -->
+                    </div>
+                    <div class="telemetry-stats" id="telemetryStats">
+                        <!-- Telemetry data will be populated dynamically -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+        
+        <!-- Timeline -->
+        <div class="timeline">
+            <div class="timeline-header">
+                <div class="timeline-controls">
+                    <button id="skipBack"><i class="fas fa-fast-backward"></i></button>
+                    <button id="playPause"><i class="fas fa-play"></i></button>
+                    <button id="skipForward"><i class="fas fa-fast-forward"></i></button>
+                </div>
+                <div class="timeline-info">
+                    <span id="currentTime">12:45:30</span>
+                    <select id="timeRange">
+                        <option value="1">Last 1 hour</option>
+                        <option value="4">Last 4 hours</option>
+                        <option value="8">Last 8 hours</option>
+                        <option value="24" selected>Last 24 hours</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Blender-style timeline with multiple tracks -->
+            <div class="timeline-tracks">
+                <div class="track-labels">
+                    <div class="track-label" data-track="person">Person</div>
+                    <div class="track-label" data-track="vehicle">Vehicle</div>
+                    <div class="track-label" data-track="thermal">Thermal</div>
+                    <div class="track-label" data-track="checkpoints">Checkpoints</div>
+                </div>
+                <div class="tracks-container">
+                    <!-- Each track will contain event markers -->
+                    <div class="timeline-track" data-track="person" id="personTrack">
+                        <!-- Person events will be added here -->
+                    </div>
+                    <div class="timeline-track" data-track="vehicle" id="vehicleTrack">
+                        <!-- Vehicle events will be added here -->
+                    </div>
+                    <div class="timeline-track" data-track="thermal" id="thermalTrack">
+                        <!-- Thermal events will be added here -->
+                    </div>
+                    <div class="timeline-track" data-track="checkpoints" id="checkpointTrack">
+                        <!-- Checkpoint events will be added here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-slider">
+                <div class="timeline-track-main">
+                    <div class="timeline-progress" id="timelineProgress"></div>
+                    <div class="timeline-handle" id="timelineHandle"></div>
+                </div>
+                <div class="time-labels" id="timeLabels">
+                    <!-- Time labels will be generated dynamically -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Event Carousel -->
+        <div class="event-carousel">
+            <div class="carousel-header">
+                <h3>Event Details</h3>
+                <div class="carousel-controls">
+                    <button id="prevEvent"><i class="fas fa-chevron-left"></i></button>
+                    <button id="nextEvent"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="carousel-container" id="eventCarousel">
+                <!-- Event cards will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal templates -->
+    <!-- Detailed Event Modal -->
+    <div class="modal" id="eventDetailModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="eventModalTitle">Event Details</h2>
+            <div id="eventModalContent">
+                <!-- Event details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Panel -->
+    <div class="panel-overlay" id="reportsPanel">
+        <div class="floating-panel">
+            <div class="panel-header">
+                <h2>REPORTS & ANALYSIS</h2>
+                <span class="close-panel">&times;</span>
+            </div>
+            <div class="panel-content">
+                <div class="report-tabs">
+                    <button class="tab-button active" data-tab="summary">Summary</button>
+                    <button class="tab-button" data-tab="alerts">Alerts</button>
+                    <button class="tab-button" data-tab="trends">Trends</button>
+                    <button class="tab-button" data-tab="compliance">Compliance</button>
+                    <button class="tab-button" data-tab="suggestions">Suggestions</button>
+                </div>
+                
+                <!-- Tab content will be populated dynamically -->
+                <div class="tab-content active" id="summary-tab">
+                    <!-- Summary content -->
+                </div>
+                <div class="tab-content" id="alerts-tab">
+                    <!-- Alerts analysis content -->
+                </div>
+                <div class="tab-content" id="trends-tab">
+                    <!-- Trends analysis content -->
+                </div>
+                <div class="tab-content" id="compliance-tab">
+                    <!-- Compliance content -->
+                </div>
+                <div class="tab-content" id="suggestions-tab">
+                    <!-- System suggestions content -->
+                </div>
+                
+                <div class="panel-footer">
+                    <button class="export-button" id="exportPDF">Export Report (PDF)</button>
+                    <button class="export-button" id="exportCSV">Export Data (CSV)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/state.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/map-controller.js"></script>
+    <script src="scripts/drone-controller.js"></script>
+    <script src="scripts/alerts-controller.js"></script>
+    <script src="scripts/timeline-controller.js"></script>
+    <script src="scripts/search-controller.js"></script>
+    <script src="scripts/reports-controller.js"></script>
+    <script src="scripts/thermal-controller.js"></script>
+    <script src="scripts/checkpoints.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
